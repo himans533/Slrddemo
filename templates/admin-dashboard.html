@@ -7059,8 +7059,14 @@
         // Edit team member
         function editTeamMember() {
             if (!currentTeamMemberId) return;
-            openEditUserModal(currentTeamMemberId);
+            
+            // Close the details modal first with a slight delay to ensure smooth transition
             closeModal('teamMemberDetailsModal');
+            
+            // Then open the edit modal after a brief delay
+            setTimeout(() => {
+                openEditUserModal(currentTeamMemberId);
+            }, 300);
         }
 
         // View member hierarchy
