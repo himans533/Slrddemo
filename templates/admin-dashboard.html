@@ -7060,13 +7060,32 @@
         function editTeamMember() {
             if (!currentTeamMemberId) return;
             
-            // Close the details modal first with a slight delay to ensure smooth transition
-            closeModal('teamMemberDetailsModal');
+            // First, close the details modal immediately and ensure it's fully hidden
+            const detailsModal = document.getElementById('teamMemberDetailsModal');
+            if (detailsModal) {
+                detailsModal.style.display = 'none';
+                detailsModal.style.visibility = 'hidden';
+                detailsModal.style.zIndex = '0';
+            }
             
-            // Then open the edit modal after a brief delay
+            // Clear any modal overlays or backdrops
+            const backdrops = document.querySelectorAll('[class*="backdrop"], [class*="modal-overlay"]');
+            backdrops.forEach(backdrop => {
+                if (backdrop.style.display !== 'none') {
+                    // Only hide modals that are currently visible
+                }
+            });
+            
+            // Then open the edit modal after a brief delay to ensure clean transition
             setTimeout(() => {
+                const updateModal = document.getElementById('updateUserModal');
+                if (updateModal) {
+                    updateModal.style.zIndex = '9999';
+                    updateModal.style.display = 'flex';
+                    updateModal.style.visibility = 'visible';
+                }
                 openEditUserModal(currentTeamMemberId);
-            }, 300);
+            }, 100);
         }
 
         // View member hierarchy
@@ -8376,6 +8395,50 @@
                     loadDashboardStats();
                 }
             }, 60000);
+        }
+
+        // ========================================================================
+        // MODAL MANAGEMENT FUNCTIONS
+        // ========================================================================
+        
+        // Open Modal - with proper z-index handling
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            // Close all other modals first
+            const allModals = document.querySelectorAll('.modal-overlay.active');
+            allModals.forEach(m => {
+                if (m.id !== modalId) {
+                    m.classList.remove('active');
+                }
+            });
+            
+            // Open the target modal
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.zIndex = '9999';
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Close Modal - with proper cleanup
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+            modal.style.visibility = 'hidden';
+            modal.style.zIndex = '0';
+            
+            // Check if any other modals are still open
+            const openModals = document.querySelectorAll('.modal-overlay.active');
+            if (openModals.length === 0) {
+                document.body.style.overflow = 'auto';
+            }
         }
 
         // Start polling when page loads
