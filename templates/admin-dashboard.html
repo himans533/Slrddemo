@@ -7060,32 +7060,13 @@
         function editTeamMember() {
             if (!currentTeamMemberId) return;
             
-            // First, close the details modal immediately and ensure it's fully hidden
-            const detailsModal = document.getElementById('teamMemberDetailsModal');
-            if (detailsModal) {
-                detailsModal.style.display = 'none';
-                detailsModal.style.visibility = 'hidden';
-                detailsModal.style.zIndex = '0';
-            }
+            // Close the details modal by removing the active class
+            closeModal('teamMemberDetailsModal');
             
-            // Clear any modal overlays or backdrops
-            const backdrops = document.querySelectorAll('[class*="backdrop"], [class*="modal-overlay"]');
-            backdrops.forEach(backdrop => {
-                if (backdrop.style.display !== 'none') {
-                    // Only hide modals that are currently visible
-                }
-            });
-            
-            // Then open the edit modal after a brief delay to ensure clean transition
+            // Open the edit modal after a brief delay to ensure smooth transition
             setTimeout(() => {
-                const updateModal = document.getElementById('updateUserModal');
-                if (updateModal) {
-                    updateModal.style.zIndex = '9999';
-                    updateModal.style.display = 'flex';
-                    updateModal.style.visibility = 'visible';
-                }
                 openEditUserModal(currentTeamMemberId);
-            }, 100);
+            }, 150);
         }
 
         // View member hierarchy
