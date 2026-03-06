@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Manage Task: {{ task.title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/responsive.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #0052cc;
+            --primary-light: #deebff;
+            --secondary: #172b4d;
+            --bg: #ffffff;
+            --bg-secondary: #f4f5f7;
+            --text: #172b4d;
+            --text-secondary: #5e6c84;
+            --text-muted: #97a0af;
+            --border: #dfe1e6;
+            --success: #36b37e;
+            --warning: #ff991f;
+            --danger: #de350b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Ubuntu, "Helvetica Neue", sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text);
+            padding: 40px 20px;
+        }
+
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(9, 30, 66, 0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text);
+            background-color: #fafbfc;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0065ff;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="task-container">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <a href="/admin-dashboard" class="back-link" style="margin-bottom: 0;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <span style="font-size: 13px; color: var(--text-muted);">Task ID: #{{ task.id }}</span>
+        </div>
+        <hr style="border-color: var(--border); margin: 12px 0 24px 0;">
+
+        <div class="card">
+            <div class="card-header" style="flex-wrap: wrap; gap: 16px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <h2 style="margin: 0; font-size: 26px; font-weight: 800; color: var(--text);">{{ task.title }}</h2>
+                    <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-folder-open" style="color: var(--primary);"></i>
+                        <span style="color: var(--text-secondary); font-size: 14px;">Project: <strong>{{
+                                task.project_title }}</strong></span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span id="taskStatusBadge" class="badge-status">
+                        {{ task.status }}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <form id="updateTaskForm">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label class="form-label">Task Title</label>
+                            <input type="text" class="form-control" name="title" value="{{ task.title }}" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description"
+                                rows="4">{{ task.description or '' }}</textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="Pending" {% if task.status=='Pending' %}selected{% endif %}>Pending
+                                </option>
+                                <option value="In Progress" {% if task.status=='In Progress' %}selected{% endif %}>In
+                                    Progress</option>
+                                <option value="Completed" {% if task.status=='Completed' %}selected{% endif %}>Completed
+                                </option>
+                                <option value="On Hold" {% if task.status=='On Hold' %}selected{% endif %}>On Hold
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" name="priority">
+                                <option value="Low" {% if task.priority=='Low' %}selected{% endif %}>Low</option>
+                                <option value="Medium" {% if task.priority=='Medium' %}selected{% endif %}>Medium
+                                </option>
+                                <option value="High" {% if task.priority=='High' %}selected{% endif %}>High</option>
+                                <option value="Critical" {% if task.priority=='Critical' %}selected{% endif %}>Critical
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Assign</label>
+                            <select class="form-select" name="assigned_to_id">
+                                <option value="">Unassigned</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}" {% if task.assigned_to_id==user.id %}selected{% endif %}>
+                                    {{ user.username }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Milestone</label>
+                            <select class="form-select" name="milestone_id">
+                                <option value="">No Milestone</option>
+                                {% for m in milestones %}
+                                <option value="{{ m.id }}" {% if task.milestone_id==m.id %}selected{% endif %}>
+                                    {{ m.title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Deadline</label>
+                            <input type="date" class="form-control" name="deadline"
+                                value="{{ task.deadline.split('T')[0] if task.deadline else '' }}">
+                        </div>
+
+                        <div class="col-12 text-end mt-5">
+                            <button type="button" class="btn btn-secondary me-2"
+                                onclick="window.location.reload()">Reset Changes</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-2"></i> Update Task Details
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 700;"><i class="fas fa-history me-2"></i> Activity
+                    Log</h3>
+            </div>
+            <div class="card-body">
+                {% if activities %}
+                {% for a in activities %}
+                <div class="history-item">
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted"><strong>{{ a.username }}</strong> performed {{ a.activity_type
+                            }}</small>
+                        <small class="text-muted">{{ a.created_at.strftime('%d %b %Y, %I:%M %p') }}</small>
+                    </div>
+                    <p style="margin: 4px 0 0 0; font-size: 14px;">{{ a.description }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center my-3">No activity recorded for this task yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getStatusColor(status) {
+            const s = (status || '').toLowerCase();
+            if (s === 'completed' || s === 'active') return '#36b37e'; // success
+            if (s === 'in progress') return '#ff991f'; // warning
+            if (s === 'pending') return '#0065ff'; // info
+            if (s === 'on hold') return '#6554c0'; // purple
+            return '#5e6c84'; // secondary
+        }
+
+        function updateBadgeStyle(status) {
+            const badge = document.getElementById('taskStatusBadge');
+            const color = getStatusColor(status);
+            badge.style.backgroundColor = color + '22';
+            badge.style.color = color;
+            badge.style.border = `1px solid ${color}44`;
+            badge.innerText = status.toUpperCase();
+        }
+
+        // Initialize badge
+        updateBadgeStyle('{{ task.status }}');
+
+        document.getElementById('updateTaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            // Handle optional fields
+            if (!data.milestone_id) data.milestone_id = null;
+            if (!data.assigned_to_id) data.assigned_to_id = null;
+
+            try {
+                const response = await fetch(`/api/employee/tasks/{{ task.id }}/update`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated!',
+                        text: 'Task has been updated successfully.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(result.error || 'Failed to update task');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
+                });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    </script>
+</body>
+
+</html>
