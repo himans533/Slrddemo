@@ -1,0 +1,345 @@
+<!-- 
+    RESPONSIVE HTML TEMPLATE GUIDE
+    For SLRD Project Management Software
+    
+    This file shows how to structure HTML for maximum mobile responsiveness.
+    Copy these patterns into your existing HTML files.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4a90b8">
+    <meta name="description" content="SLRD Project Management System">
+    
+    <!-- CSS Files in Order of Specificity -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    
+    <title>Project Management Dashboard</title>
+</head>
+<body>
+
+    <!-- ===== RESPONSIVE LAYOUT STRUCTURE ===== -->
+    <div class="app-container">
+        
+        <!-- ===== MOBILE NAVIGATION HAMBURGER ===== -->
+        <nav class="top-header">
+            <!-- Toggle button will be inserted here by mobile-nav.js -->
+            
+            <!-- Breadcrumb Navigation (Hidden on Mobile) -->
+            <div class="breadcrumb-nav">
+                <span><a href="/">Dashboard</a></span>
+                <span>/</span>
+                <span class="current">Projects</span>
+            </div>
+            
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-icon" id="notificationBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="user-profile">
+                    <img src="/avatar.png" alt="User Avatar" class="avatar">
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== SIDEBAR NAVIGATION ===== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="slrd-logo">SLRD</div>
+                    <div class="logo-text">Project Management</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <!-- Desktop: Always visible | Mobile: Hamburger toggle -->
+                <a href="/dashboard" class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/projects" class="nav-item">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Projects</span>
+                </a>
+                <a href="/tasks" class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tasks</span>
+                </a>
+                <a href="/team" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Team</span>
+                </a>
+                <a href="/settings" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="/logout" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <div class="user-name">John Doe</div>
+                    <div class="user-role">Admin</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content">
+            <div class="content-area">
+                
+                <!-- ===== RESPONSIVE CARDS GRID ===== -->
+                <!-- Mobile: 1 column | Tablet: 2-3 columns | Desktop: 4 columns -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>24</h3>
+                            <p>Active Projects</p>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>156</h3>
+                            <p>Completed Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>42</h3>
+                            <p>Pending Tasks</p>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>8</h3>
+                            <p>Overdue Tasks</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== RESPONSIVE TABLE ===== -->
+                <!-- Automatically scrolls on mobile -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Recent Tasks</h3>
+                        <p>Latest task updates across all projects</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="task-table">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th class="hide-mobile">Project</th>
+                                    <th class="hide-mobile">Assigned To</th>
+                                    <th>Status</th>
+                                    <th class="hide-mobile">Progress</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Design Homepage</strong></td>
+                                    <td class="hide-mobile">Website Redesign</td>
+                                    <td class="hide-mobile">Jane Smith</td>
+                                    <td><span class="status-badge in-progress">In Progress</span></td>
+                                    <td class="hide-mobile">
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 75%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary">View</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API Integration</strong></td>
+                                    <td class="hide-mobile">Backend Dev</td>
+                                    <td class="hide-mobile">John Dev</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                    <td class="hide-mobile">
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 100%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-secondary">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== RESPONSIVE PROJECTS GRID ===== -->
+                <!-- Mobile: 1 column | Tablet: 2 columns | Desktop: 3+ columns -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Active Projects</h3>
+                    </div>
+                    <div style="padding: var(--spacing-lg);">
+                        <div class="projects-grid">
+                            <div class="project-card">
+                                <div class="project-header">
+                                    <div>
+                                        <h4>Website Redesign</h4>
+                                        <p class="project-description">Complete redesign of company website with modern UI</p>
+                                    </div>
+                                </div>
+                                <div class="project-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div class="project-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-users"></i>
+                                        5 Members
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        Due: Mar 30
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="project-card">
+                                <div class="project-header">
+                                    <div>
+                                        <h4>Mobile App Dev</h4>
+                                        <p class="project-description">Native iOS and Android application development</p>
+                                    </div>
+                                </div>
+                                <div class="project-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                                <div class="project-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-users"></i>
+                                        8 Members
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        Due: Apr 15
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== RESPONSIVE FORM ===== -->
+                <!-- Stacks vertically on mobile, columns on desktop -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h3>Create New Task</h3>
+                    </div>
+                    <form style="padding: var(--spacing-lg);">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Task Name</label>
+                                <input type="text" class="form-control" placeholder="Enter task name">
+                            </div>
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select class="form-control">
+                                    <option>Low</option>
+                                    <option>Medium</option>
+                                    <option>High</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-control" placeholder="Enter task description" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Assign To</label>
+                                <select class="form-control">
+                                    <option>Select team member</option>
+                                    <option>John Doe</option>
+                                    <option>Jane Smith</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Due Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+
+                        <!-- Full-width buttons on mobile, side-by-side on desktop -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create Task</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== RESPONSIVE MODAL EXAMPLE ===== -->
+    <div class="modal-overlay" id="exampleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Project</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Project Name</label>
+                    <input type="text" class="form-control" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" placeholder="Project description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').style.display='none'">
+                    Cancel
+                </button>
+                <button class="btn btn-primary">Create Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/common-utils.js"></script>
+    <script src="/static/js/mobile-nav.js"></script>
+    
+</body>
+</html>

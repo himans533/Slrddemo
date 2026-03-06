@@ -1,0 +1,801 @@
+/* ===============================================
+   RESPONSIVE INTEGRATION CSS
+   Integrates with existing style.css and responsive.css
+   Provides additional responsive overrides and fixes
+   =============================================== */
+
+/* ===============================================
+   OVERRIDE DESKTOP-ONLY FIXED WIDTHS
+   =============================================== */
+
+/* Fix container widths for responsiveness */
+.container,
+.container-fluid {
+    width: 100%;
+    padding: 0;
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 100%;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
+/* ===============================================
+   FIX EXISTING DESKTOP STYLES FOR MOBILE
+   =============================================== */
+
+/* Override fixed sidebar width on mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0;
+        overflow: hidden;
+        z-index: 1000;
+        min-height: auto;
+    }
+
+    .sidebar.show {
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    /* Fix sidebar scrolling */
+    .sidebar-nav {
+        max-height: calc(100vh - 300px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-user {
+        position: sticky;
+        bottom: 0;
+        background: inherit;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE SPACING FIXES
+   =============================================== */
+
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+
+    h1 { font-size: 20px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 16px; }
+    h4 { font-size: 15px; }
+    h5 { font-size: 14px; }
+    h6 { font-size: 13px; }
+
+    .content-area {
+        padding: 8px !important;
+    }
+
+    .content-card,
+    .card,
+    .card-body {
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .stat-card {
+        padding: 12px !important;
+        margin-bottom: 8px;
+    }
+
+    .project-card {
+        padding: 12px !important;
+    }
+
+    .task-card {
+        padding: 12px !important;
+    }
+
+    /* Fix padding for narrow screens */
+    .card-header,
+    .modal-header,
+    .modal-footer {
+        padding: 12px !important;
+    }
+
+    .modal-body {
+        padding: 12px !important;
+    }
+
+    /* Button spacing */
+    .btn-group,
+    .button-group {
+        gap: 6px;
+    }
+
+    /* Reduce gaps in grids */
+    .stats-grid,
+    .projects-grid,
+    .team-grid {
+        gap: 8px !important;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE SEARCH BOX
+   =============================================== */
+
+@media (max-width: 768px) {
+    .search-box {
+        width: 100%;
+        order: 3;
+        flex-basis: 100%;
+        margin-top: 8px;
+    }
+
+    .search-box input {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+}
+
+@media (min-width: 768px) {
+    .search-box {
+        flex: 1;
+        max-width: 300px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE HEADER ACTIONS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .header-actions {
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .header-actions .btn,
+    .header-actions button {
+        padding: 6px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+
+    .user-profile img {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE TABLES FIX
+   =============================================== */
+
+@media (max-width: 768px) {
+    table {
+        font-size: 12px;
+    }
+
+    table th,
+    table td {
+        padding: 8px !important;
+    }
+
+    /* Stack table on mobile if needed */
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Make columns narrower */
+    .task-name,
+    .project-title {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE STAT CARDS
+   =============================================== */
+
+@media (max-width: 480px) {
+    .stat-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .stat-content h3 {
+        font-size: 20px;
+    }
+
+    .stat-content p {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+    .stat-card {
+        flex-direction: row;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+    }
+
+    .stat-content h3 {
+        font-size: 22px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE PROJECT CARDS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .project-card {
+        padding: 12px;
+    }
+
+    .project-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .project-title {
+        font-size: 15px;
+    }
+
+    .project-description {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .project-meta {
+        gap: 12px;
+    }
+
+    .meta-item {
+        font-size: 11px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE TASK CARDS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .task-card {
+        padding: 12px;
+    }
+
+    .task-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .task-header h4 {
+        font-size: 14px;
+    }
+
+    .task-badges {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .status-badge,
+    .priority-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .task-description {
+        font-size: 12px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE FORM INPUTS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .form-control,
+    input,
+    textarea,
+    select {
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 10px 12px;
+        min-height: 44px;
+        border-radius: 6px;
+    }
+
+    textarea {
+        min-height: 120px;
+    }
+
+    /* Input focus state */
+    .form-control:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--primary-color, #4a90b8);
+        box-shadow: 0 0 0 3px rgba(74, 144, 184, 0.1);
+    }
+}
+
+/* ===============================================
+   RESPONSIVE MODAL SIZING
+   =============================================== */
+
+@media (max-width: 480px) {
+    .modal-content,
+    .modal-dialog,
+    .modal-overlay {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .modal-content {
+        border-radius: 8px 8px 0 0;
+    }
+
+    .modal-header {
+        padding: 12px;
+    }
+
+    .modal-header h3 {
+        font-size: 16px;
+    }
+
+    .modal-body {
+        padding: 12px;
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .modal-footer button {
+        flex: 1;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE PROGRESS BARS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .progress {
+        height: 4px;
+        border-radius: 2px;
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+
+    .progress-info {
+        font-size: 11px;
+        gap: 8px;
+    }
+
+    .progress-label {
+        font-size: 11px;
+    }
+
+    .progress-value {
+        font-size: 12px;
+        font-weight: 600;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE BADGES & STATUS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .status-badge,
+    .priority-badge,
+    .role-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 3px;
+    }
+
+    .badge {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE BUTTONS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .btn,
+    button,
+    input[type="button"],
+    input[type="submit"] {
+        font-size: 13px;
+        padding: 10px 12px;
+        min-height: 44px;
+        min-width: 44px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-sm {
+        font-size: 11px;
+        padding: 6px 10px;
+        min-height: 36px;
+    }
+
+    .btn-lg {
+        font-size: 15px;
+        padding: 12px 16px;
+        min-height: 48px;
+    }
+
+    /* Full-width buttons on mobile */
+    .btn-block,
+    .btn-full {
+        display: block;
+        width: 100%;
+    }
+
+    /* Button groups stack on mobile */
+    .btn-group-vertical,
+    .form-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-group-vertical > .btn,
+    .form-actions > .btn,
+    .form-actions > button {
+        width: 100%;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE COMMENTS & LISTS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .comment-item {
+        padding: 8px 0;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .comment-header .author {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .comment-header .timestamp {
+        font-size: 11px;
+    }
+
+    .comment-content {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE TEAM CARDS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .team-member-card {
+        padding: 12px;
+    }
+
+    .member-header {
+        gap: 10px;
+    }
+
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .member-info h4 {
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .member-stats {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .stat-number {
+        font-size: 18px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE BREADCRUMBS & NAVIGATION
+   =============================================== */
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        font-size: 12px;
+        padding: 6px 0;
+        margin: 0;
+    }
+
+    .breadcrumb-item {
+        display: inline-block;
+    }
+
+    .breadcrumb-item + .breadcrumb-item:before {
+        content: "/";
+        margin: 0 6px;
+    }
+
+    /* Hide full breadcrumb on very small screens */
+    .breadcrumb-nav {
+        display: none;
+    }
+
+    @media (min-width: 480px) {
+        .breadcrumb-nav {
+            display: flex;
+        }
+    }
+}
+
+/* ===============================================
+   RESPONSIVE ACTIVITY PANEL
+   =============================================== */
+
+@media (max-width: 768px) {
+    .activity-panel {
+        width: 100%;
+        max-width: 100%;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        height: auto;
+        max-height: 70vh;
+        border-radius: 12px 12px 0 0;
+        transform: translateY(100%);
+    }
+
+    .activity-panel.open {
+        transform: translateY(0);
+    }
+
+    .activity-panel-header {
+        padding: 16px;
+    }
+
+    .activity-item {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE DROPDOWNS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .dropdown-menu {
+        font-size: 13px;
+        min-width: 160px;
+    }
+
+    .dropdown-item {
+        padding: 10px 16px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+/* ===============================================
+   RESPONSIVE ALERTS
+   =============================================== */
+
+@media (max-width: 768px) {
+    .alert {
+        font-size: 12px;
+        padding: 12px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+    }
+
+    .alert-close {
+        font-size: 16px;
+        padding: 4px;
+    }
+}
+
+/* ===============================================
+   UTILITY OVERRIDES FOR MOBILE
+   =============================================== */
+
+@media (max-width: 768px) {
+    /* Margin utilities */
+    .m-0 { margin: 0 !important; }
+    .m-1 { margin: 4px !important; }
+    .m-2 { margin: 8px !important; }
+    .m-3 { margin: 12px !important; }
+    .m-4 { margin: 16px !important; }
+    .m-5 { margin: 20px !important; }
+
+    /* Padding utilities */
+    .p-0 { padding: 0 !important; }
+    .p-1 { padding: 4px !important; }
+    .p-2 { padding: 8px !important; }
+    .p-3 { padding: 12px !important; }
+    .p-4 { padding: 16px !important; }
+    .p-5 { padding: 20px !important; }
+
+    /* Gap utilities */
+    .gap-1 { gap: 4px !important; }
+    .gap-2 { gap: 8px !important; }
+    .gap-3 { gap: 12px !important; }
+    .gap-4 { gap: 16px !important; }
+
+    /* Display utilities */
+    .d-none { display: none !important; }
+    .d-block { display: block !important; }
+    .d-flex { display: flex !important; }
+    .d-grid { display: grid !important; }
+    .d-inline { display: inline !important; }
+    .d-inline-block { display: inline-block !important; }
+
+    /* Width utilities */
+    .w-100 { width: 100% !important; }
+    .w-auto { width: auto !important; }
+
+    /* Text utilities */
+    .text-center { text-align: center !important; }
+    .text-left { text-align: left !important; }
+    .text-right { text-align: right !important; }
+
+    /* Flexbox utilities */
+    .flex-column { flex-direction: column !important; }
+    .flex-wrap { flex-wrap: wrap !important; }
+    .justify-content-center { justify-content: center !important; }
+    .justify-content-between { justify-content: space-between !important; }
+    .align-items-center { align-items: center !important; }
+    .align-items-start { align-items: flex-start !important; }
+    .align-items-end { align-items: flex-end !important; }
+}
+
+/* ===============================================
+   MEDIA QUERY UTILITY CLASSES
+   =============================================== */
+
+/* Hide on mobile */
+.hide-mobile {
+    display: none;
+}
+
+/* Show on mobile only */
+.show-mobile {
+    display: inherit;
+}
+
+/* Show/hide based on screen size */
+@media (min-width: 480px) {
+    .hide-sm { display: none !important; }
+}
+
+@media (min-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: none !important; }
+    .show-tablet { display: inherit !important; }
+}
+
+@media (min-width: 1024px) {
+    .hide-desktop { display: none !important; }
+    .show-tablet { display: none !important; }
+    .show-desktop { display: inherit !important; }
+}
+
+/* ===============================================
+   PRINT OPTIMIZATION
+   =============================================== */
+
+@media print {
+    .sidebar,
+    .top-header,
+    .sidebar-toggle,
+    .header-actions,
+    .theme-toggle,
+    .modal-overlay {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    body {
+        background: white !important;
+    }
+
+    .content-card,
+    .stat-card,
+    .project-card,
+    .task-card {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
