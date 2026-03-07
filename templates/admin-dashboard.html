@@ -9,7 +9,9 @@
     <title>Super Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="/responsive.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="stylesheet" href="/static/css/theme.css" />
+    <link rel="stylesheet" href="/static/css/responsive.css" />
     <script src="/static/js/common-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -1616,8 +1618,8 @@
                             class="company-logo">
                     </div>
                     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme"
-                        style="background: transparent; border: 1px solid rgba(255,255,255,0.1); color: white; width: 32px; height: 32px; margin: 0;">
-                        <i class="fas fa-moon"></i>
+                        style="background: var(--theme-toggle-bg); border: 1px solid rgba(255,255,255,0.2); color: var(--theme-toggle-icon); width: 40px; height: 40px; margin: 0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                        <i class="fas fa-moon" style="font-size: 16px;"></i>
                     </button>
                 </div>
                 <h2>Super Admin Dashboard</h2>
@@ -8360,6 +8362,53 @@
                 }
             }, 5000); // Update every 5 seconds
         }
+
+        // ========================================================================
+        // THEME TOGGLE FUNCTIONALITY
+        // ========================================================================
+        
+        // Initialize theme from localStorage
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleIcon(savedTheme);
+        }
+        
+        // Toggle between light and dark mode
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            // Update DOM
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            // Save to localStorage
+            localStorage.setItem('theme', newTheme);
+            
+            // Update icon
+            updateThemeToggleIcon(newTheme);
+            
+            console.log('[v0] Theme toggled to:', newTheme);
+        }
+        
+        // Update theme toggle icon based on current theme
+        function updateThemeToggleIcon(theme) {
+            const themeToggle = document.querySelector('.theme-toggle i');
+            if (themeToggle) {
+                if (theme === 'dark') {
+                    themeToggle.classList.remove('fa-moon');
+                    themeToggle.classList.add('fa-sun');
+                } else {
+                    themeToggle.classList.remove('fa-sun');
+                    themeToggle.classList.add('fa-moon');
+                }
+            }
+        }
+        
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+        });
 
         // Global polling for Live Activity and Dashboard Stats
         function startGlobalPolling() {
