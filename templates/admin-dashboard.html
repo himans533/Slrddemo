@@ -4033,25 +4033,36 @@
         // Open Edit User Modal
         async function openEditUserModal(userId) {
             try {
-                openModal('updateUserModal');
-
-                // Find user from users array or fetch
-                const user = users.find(u => u.id == userId);
-                if (!user) {
-                    showToast('User not found', 'error');
-                    return;
-                }
-
-                document.getElementById('updateUsrId').value = user.id;
-                document.getElementById('updateUsrUsername').value = user.username || '';
-                document.getElementById('updateUsrEmail').value = user.email || '';
-                document.getElementById('updateUsrUserType').value = user.user_type_id || '';
-
-                // Clear password field
-                document.getElementById('updateUsrPassword').value = '';
-
+            // Ensure details modal is completely closed
+            const detailsModal = document.getElementById('teamMemberDetailsModal');
+            if (detailsModal) {
+                detailsModal.classList.remove('active');
+            }
+            
+            // Open the update modal with proper z-index
+            const updateModal = document.getElementById('updateUserModal');
+            if (updateModal) {
+                updateModal.classList.add('active');
+                updateModal.style.zIndex = '9999';
+            }
+            
+            // Find user from users array or fetch
+            const user = users.find(u => u.id == userId);
+            if (!user) {
+                showToast('User not found', 'error');
+                return;
+            }
+            
+            document.getElementById('updateUsrId').value = user.id;
+            document.getElementById('updateUsrUsername').value = user.username || '';
+            document.getElementById('updateUsrEmail').value = user.email || '';
+            document.getElementById('updateUsrUserType').value = user.user_type_id || '';
+            
+            // Clear password field
+            document.getElementById('updateUsrPassword').value = '';
+            
             } catch (error) {
-                console.error('Error opening edit modal:', error);
+            console.error('Error opening edit modal:', error);
                 showToast('Error loading user data', 'error');
             }
         }
@@ -4644,48 +4655,68 @@
         // Update User
         async function updateUserSubmit() {
             try {
-                const userId = document.getElementById('updateUsrId').value;
-                const username = document.getElementById('updateUsrUsername').value.trim();
-                const email = document.getElementById('updateUsrEmail').value.trim();
-                const password = document.getElementById('updateUsrPassword').value;
-                const userTypeId = document.getElementById('updateUsrUserType').value;
-
-                if (!username || !email || !userTypeId) {
-                    showToast('Please fill all required fields', 'warning');
-                    return;
-                }
-
-                const data = {
-                    username,
-                    email,
-                    user_type_id: userTypeId
-                };
-
-                if (password) {
-                    data.password = password;
-                }
-
-                const response = await fetch(`/api/users/${userId}`, {
-                    method: 'PUT',
-                    headers: getHeaders(),
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    showToast(error.message || 'Update failed', 'error');
-                    return;
-                }
-
-                showToast('User updated successfully', 'success');
-                closeModal('updateUserModal');
-                loadAllUsersWithDetails(); // Refresh the users list
-
-            } catch (error) {
-                console.error('Error updating user:', error);
-                showToast('Error updating user', 'error');
+            const userId = document.getElementById('updateUsrId').value;
+            const username = document.getElementById('updateUsrUsername').value.trim();
+            const email = document.getElementById('updateUsrEmail').value.trim();
+            const password = document.getElementById('updateUsrPassword').value;
+            const userTypeId = document.getElementById('updateUsrUserType').value;
+            
+            if (!username || !email || !userTypeId) {
+                showToast('Please fill all required fields', 'warning');
+                return;
             }
-        }
+            
+            const data = {
+                username,
+                email,
+                user_type_id: userTypeId
+            };
+            
+            if (password) {
+                data.password = password;
+            }
+            
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: getHeaders(),
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                showToast(error.message || 'Update failed', 'error');
+                return;
+            }
+            
+            // Show success message
+            showToast('User updated successfully', 'success');
+            
+            // Close the update modal
+            closeModal('updateUserModal');
+            
+            // Refresh the users list
+            loadAllUsersWithDetails();
+            
+            // Redirect back to the previous modal if it was stored
+            if (window.previousModalState) {
+                setTimeout(() => {
+                    const previousModal = document.getElementById(window.previousModalState.modalId);
+                    if (previousModal) {
+                        previousModal.classList.add('active');
+                        currentTeamMemberId = window.previousModalState.userId;
+                        // Reload the details for the modal
+                        loadTeamMemberDetails(window.previousModalState.userId);
+                    }
+                    // Clear the stored state
+                    window.previousModalState = null;
+                }, 800);
+            }
+            
+            } catch (error) {
+            console.error('Error updating user:', error);
+            showToast('Error updating user', 'error');
+            }
+            }
 
 
 
@@ -7058,17 +7089,26 @@
             }
         }
 
-        // Edit team member
+        // Edit team member - with modal state management
         function editTeamMember() {
             if (!currentTeamMemberId) return;
             
-            // Close the details modal by removing the active class
-            closeModal('teamMemberDetailsModal');
+            // Store the current modal state to return after editing
+            window.previousModalState = {
+                modalId: 'teamMemberDetailsModal',
+                userId: currentTeamMemberId
+            };
             
-            // Open the edit modal after a brief delay to ensure smooth transition
+            // Close the details modal completely
+            const detailsModal = document.getElementById('teamMemberDetailsModal');
+            if (detailsModal) {
+                detailsModal.classList.remove('active');
+            }
+            
+            // Open the edit modal after a brief delay to ensure clean transition
             setTimeout(() => {
                 openEditUserModal(currentTeamMemberId);
-            }, 150);
+            }, 250);
         }
 
         // View member hierarchy
