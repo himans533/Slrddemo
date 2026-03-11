@@ -4,14 +4,12 @@ from flask_cors import CORS
 import os
 import sqlite3
 
-# Rate limiting
+# Rate limiting - using simple in-memory storage for local development
 try:
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
 except Exception:
     Limiter = None
-
-REDIS_URL = os.environ.get('REDIS_URL')
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -72,14 +70,13 @@ app.json = CustomJSONProvider(app)
 csrf = CSRFProtect(app)
 CORS(app)
 
-# Persistent secret key for Replit environment
-# app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
-app.secret_key = os.environ["SECRET_KEY"]
+# Use a local development secret key
+app.secret_key = os.environ.get("SECRET_KEY", "local-dev-secret-key-change-in-production")
 
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE = os.environ.get("ENV") == "production",
+    SESSION_COOKIE_SECURE=False,  # Set to False for local development
 )
 
 valid_tokens = {}
@@ -184,9 +181,7 @@ def internal_error(e):
 @app.after_request
 def set_security_headers(response):
     try:
-        # Only set HSTS when running under https/production
-        if request.scheme == 'https' or os.environ.get('FLASK_ENV') == 'production':
-            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    # HSTS disabled for local development
     except Exception:
         pass
 
@@ -201,27 +196,21 @@ def set_security_headers(response):
 # Make session cookies secure when appropriate
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = True if os.environ.get('FLASK_ENV') == 'production' else False
+app.config['SESSION_COOKIE_SECURE'] = False  # Local development
 
-# Initialize rate limiter (use Redis if available)
+# Initialize rate limiter for local development (in-memory storage)
 limiter = None
 if Limiter is not None:
     try:
-        if REDIS_URL:
-            # Using storage_uri lets flask-limiter auto-configure RedisStorage when possible
-            limiter = Limiter(key_func=get_client_ip, app=app, storage_uri=REDIS_URL, default_limits=["1000 per hour"])
-        else:
-            # Use filesystem-based storage as fallback (suitable for production)
-            # This stores rate limit data in /tmp/flask-limiter.db
-            limiter = Limiter(
-                key_func=get_client_ip, 
-                app=app, 
-                storage_uri="memory://",  # memory:// is acceptable for single-dyno deployments
-                default_limits=["1000 per hour"]
-            )
-            logger.info("Flask-Limiter using in-memory storage. For multi-dyno deployments, configure REDIS_URL.")
+        limiter = Limiter(
+            key_func=get_client_ip, 
+            app=app, 
+            storage_uri="memory://",
+            default_limits=["1000 per hour"]
+        )
+        logger.info("✓ Rate limiter configured (in-memory storage)")
     except Exception as e:
-        logger.warning(f"Flask-Limiter initialization failed: {e}")
+        logger.warning(f"Rate limiter initialization failed: {e}")
         limiter = None
 else:
     logger.info("flask-limiter not installed; skipping rate-limiter setup")
@@ -1059,8 +1048,7 @@ def admin_project_detail(project_id):
 def admin_task_detail(task_id):
     try:
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
 
         # 1. Fetch Task Details with basic relations
         cursor.execute('''
@@ -1432,8 +1420,7 @@ def create_daily_report():
 
         # Get current user's role
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
         cursor.execute(
             '''
             SELECT ut.user_role FROM users u 
@@ -7366,8 +7353,7 @@ def get_daily_reports():
     try:
         current_user_id = get_current_user_id()
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
 
         # Get current user's role
         cursor.execute('''
@@ -7561,8 +7547,7 @@ def submit_daily_report():
         data = request.get_json() or {}
         
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
 
         # Get current user's role
         cursor.execute('''
@@ -7742,8 +7727,7 @@ def get_daily_reports_stats():
     """Get statistics for daily reports - returns shape matching frontend charts"""
     try:
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
 
         # Total reports
         cursor.execute('SELECT COUNT(*) as count FROM daily_task_reports')
@@ -7869,8 +7853,7 @@ def get_daily_reports_dashboard_stats():
     """Comprehensive daily reports statistics for Super Admin Dashboard"""
     try:
         conn = get_db_connection()
-        from psycopg2.extras import RealDictCursor
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
 
         # Total metrics
         cursor.execute('SELECT COUNT(*) as count FROM daily_task_reports')
@@ -9978,5 +9961,7 @@ def expand_hierarchy_node(node_type, node_id):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+    # Local development configuration
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("DEBUG", "True").lower() == "true"
+    app.run(host="127.0.0.1", port=port, debug=debug)
