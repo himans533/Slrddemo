@@ -2,6 +2,7 @@
 from flask import Flask, jsonify, request, render_template, session, g, send_from_directory
 from flask_cors import CORS
 import os
+import sqlite3
 
 # Rate limiting
 try:
@@ -19,11 +20,8 @@ import secrets
 import json
 import re
 import io
-import psycopg2
 import logging
 import traceback
-from urllib.parse import urlparse
-from psycopg2.extras import RealDictCursor
 from flask.json.provider import DefaultJSONProvider
 from datetime import datetime, timezone, timedelta, date , time
 from flask import redirect, url_for
@@ -240,69 +238,16 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+# SQLite database configuration
+DB_PATH = os.path.join(os.path.dirname(__file__), 'slrddemo.db')
 
-
-
-class PostgreSQLConnection:
-    """Wrapper for psycopg2 connection to emulate SQLite row_factory behavior"""
-    def __init__(self, psycopg2_conn):
-        self._conn = psycopg2_conn
-        self._committed = False
-    
-    def cursor(self, **kwargs):
-        return self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    
-    def commit(self):
-        self._conn.commit()
-        self._committed = True
-    
-    def rollback(self):
-        self._conn.rollback()
-    
-    def close(self):
-        self._conn.close()
-    
-    def __getattr__(self, name):
-        return getattr(self._conn, name)
 
 def get_db_connection():
-    """Create a PostgreSQL connection with proper error handling"""
-    database_url = os.environ.get("DATABASE_URL")
-
-    if not database_url:
-        error_msg = (
-            "CRITICAL: DATABASE_URL environment variable not set! "
-            "Please configure it in your Railway project variables."
-        )
-        logger.error(error_msg)
-        raise Exception(error_msg)
-
-    # Normalize older "postgres://" scheme used by some providers to the form
-    # accepted by some libraries: "postgresql://"
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-
+    """Create a SQLite connection with proper error handling"""
     try:
-        # Parse URL and build params
-        result = urlparse(database_url)
-
-        conn_params = {
-            "database": result.path.lstrip("/"),
-            "user": result.username,
-            "password": result.password,
-            "host": result.hostname,
-            "port": result.port or 5432,
-            "connect_timeout": 10,
-        }
-
-        # Use SSL on production / railway
-        if os.environ.get("FLASK_ENV") == "production" or "railway" in (database_url or "").lower():
-            conn_params["sslmode"] = "require"
-
-        # Create connection with RealDictCursor so cursor.fetchall() returns mapping-like rows
-        conn = psycopg2.connect(cursor_factory=RealDictCursor, **conn_params)
-
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row  # Makes rows accessible like dictionaries
+        conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign key constraints
         logger.info("✓ Database connection successful!")
         return conn
     except Exception as e:
@@ -312,17 +257,20 @@ def get_db_connection():
    
 
 def init_db():
-    """Initialize PostgreSQL database (idempotent)"""
+    """Initialize SQLite database (idempotent)"""
     conn = None
     try:
         logger.info("Starting database initialization...")
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Enable foreign keys
+        cursor.execute("PRAGMA foreign_keys = ON")
+
         # Create usertypes table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usertypes (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_role TEXT NOT NULL UNIQUE,
                 description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -333,11 +281,11 @@ def init_db():
         # Create usertype_permissions table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS usertype_permissions (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usertype_id INTEGER NOT NULL,
                 module TEXT NOT NULL,
                 action TEXT NOT NULL,
-                granted BOOLEAN DEFAULT FALSE,
+                granted BOOLEAN DEFAULT 0,
                 FOREIGN KEY (usertype_id) REFERENCES usertypes(id) ON DELETE CASCADE,
                 UNIQUE(usertype_id, module, action)
             )
@@ -346,40 +294,35 @@ def init_db():
 
         # Create users table
         cursor.execute('''
-             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL UNIQUE,
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 user_type_id INTEGER NOT NULL,
-                granted BOOLEAN DEFAULT FALSE,
+                granted BOOLEAN DEFAULT 0,
                 status TEXT DEFAULT 'Active',
                 phone TEXT,
                 department TEXT,
                 bio TEXT,
                 avatar_url TEXT,
                 is_system INTEGER DEFAULT 0,
-
-        -- 🔥 ADD THIS
-        created_by_id INTEGER,
-
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-        FOREIGN KEY (user_type_id) REFERENCES usertypes(id),
-        FOREIGN KEY (created_by_id) REFERENCES users(id) ON DELETE SET NULL
-    )
-''')
-
+                created_by_id INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_type_id) REFERENCES usertypes(id),
+                FOREIGN KEY (created_by_id) REFERENCES users(id) ON DELETE SET NULL
+            )
+        ''')
         logger.debug("✓ users table ready")
 
         # Create user_permissions table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_permissions (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 module TEXT NOT NULL,
                 action TEXT NOT NULL,
-                granted BOOLEAN DEFAULT FALSE,
+                granted BOOLEAN DEFAULT 0,
                 FOREIGN KEY (user_id) REFERENCES users(id),
                 UNIQUE(user_id, module, action)
             )
@@ -389,7 +332,7 @@ def init_db():
         # Create projects table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS projects (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 description TEXT,
                 status TEXT DEFAULT 'In Progress',
@@ -405,41 +348,56 @@ def init_db():
         ''')
         logger.debug("✓ projects table ready")
 
+        # Create milestones table (must be created before tasks that reference it)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS milestones (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                due_date DATE,
+                status TEXT DEFAULT 'Pending',
+                project_id INTEGER NOT NULL,
+                weightage INTEGER DEFAULT 1,
+                created_by_id INTEGER NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (project_id) REFERENCES projects(id),
+                FOREIGN KEY (created_by_id) REFERENCES users(id)
+            )
+        ''')
+        logger.debug("✓ milestones table ready")
+
         # Create tasks table
         cursor.execute('''
-                CREATE TABLE IF NOT EXISTS tasks (
-                id SERIAL PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-        description TEXT,
-        status TEXT DEFAULT 'Pending',
-        priority TEXT DEFAULT 'Medium',
-        deadline DATE,
-        project_id INTEGER NOT NULL,
-        created_by_id INTEGER NOT NULL,
-        assigned_to_id INTEGER,
-        milestone_id INTEGER,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        completed_at TIMESTAMP,
-        approval_status TEXT DEFAULT 'pending',
-        weightage INTEGER DEFAULT 1,
-
-        -- ✅ ADD THESE NEW COLUMNS
-        progress INTEGER DEFAULT 0,
-        notes TEXT,
-
-        FOREIGN KEY (project_id) REFERENCES projects(id),
-        FOREIGN KEY (created_by_id) REFERENCES users(id),
-        FOREIGN KEY (assigned_to_id) REFERENCES users(id),
-        FOREIGN KEY (milestone_id) REFERENCES milestones(id)
-    )
-''')
+                description TEXT,
+                status TEXT DEFAULT 'Pending',
+                priority TEXT DEFAULT 'Medium',
+                deadline DATE,
+                project_id INTEGER NOT NULL,
+                created_by_id INTEGER NOT NULL,
+                assigned_to_id INTEGER,
+                milestone_id INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP,
+                approval_status TEXT DEFAULT 'pending',
+                weightage INTEGER DEFAULT 1,
+                progress INTEGER DEFAULT 0,
+                notes TEXT,
+                FOREIGN KEY (project_id) REFERENCES projects(id),
+                FOREIGN KEY (created_by_id) REFERENCES users(id),
+                FOREIGN KEY (assigned_to_id) REFERENCES users(id),
+                FOREIGN KEY (milestone_id) REFERENCES milestones(id)
+            )
+        ''')
 
 
         # Create comments table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS comments (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 content TEXT NOT NULL,
                 author_id INTEGER NOT NULL,
                 project_id INTEGER,
@@ -455,7 +413,7 @@ def init_db():
         # Create documents table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS documents (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 filename TEXT NOT NULL,
                 original_filename TEXT NOT NULL,
                 file_size INTEGER,
@@ -470,56 +428,26 @@ def init_db():
         ''')
         logger.debug("✓ documents table ready")
 
-        # Create milestones table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS milestones (
-                id SERIAL PRIMARY KEY,
-                title TEXT NOT NULL,
-                description TEXT,
-                due_date DATE,
-                status TEXT DEFAULT 'Pending',
-                project_id INTEGER NOT NULL,
-                weightage INTEGER DEFAULT 1,
-                created_by_id INTEGER NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (project_id) REFERENCES projects(id),
-                FOREIGN KEY (created_by_id) REFERENCES users(id)
-            )
-        ''')
-        logger.debug("✓ milestones table ready")
-
         # Create project_assignments table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS project_assignments (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 project_id INTEGER NOT NULL,
                 reporting_manager_id INTEGER,
-                reports_to_admin BOOLEAN DEFAULT FALSE,
+                reports_to_admin BOOLEAN DEFAULT 0,
                 FOREIGN KEY (user_id) REFERENCES users(id),
                 FOREIGN KEY (project_id) REFERENCES projects(id),
                 FOREIGN KEY (reporting_manager_id) REFERENCES users(id),
                 UNIQUE(user_id, project_id)
             )
         ''')
-        
-        # Schema migration: ensure columns exist for existing tables
-        try:
-            # Postgres 9.6+ supports ADD COLUMN IF NOT EXISTS
-            cursor.execute("ALTER TABLE project_assignments ADD COLUMN IF NOT EXISTS reporting_manager_id INTEGER")
-            cursor.execute("ALTER TABLE project_assignments ADD COLUMN IF NOT EXISTS reports_to_admin BOOLEAN DEFAULT FALSE")
-            conn.commit()
-            logger.info("✓ project_assignments schema migration updated")
-        except Exception as e:
-            if conn: conn.rollback()
-            logger.warning(f"Note: Migration column addition handled or skipped: {e}")
-            
         logger.debug("✓ project_assignments table ready")
 
         # Create progress_history table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS progress_history (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 project_id INTEGER NOT NULL,
                 progress_percentage INTEGER,
                 tasks_completed INTEGER,
@@ -539,7 +467,7 @@ def init_db():
         # Create activities table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS activities (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 activity_type TEXT NOT NULL,
                 description TEXT NOT NULL,
@@ -558,7 +486,7 @@ def init_db():
         # Create user_skills table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS user_skills (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 skill_name TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -571,7 +499,7 @@ def init_db():
         # Create daily_task_reports table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS daily_task_reports (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 task_id INTEGER,
                 project_id INTEGER NOT NULL,
@@ -602,11 +530,11 @@ def init_db():
         # Create report_comments table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS report_comments (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 report_id INTEGER NOT NULL,
                 commenter_id INTEGER NOT NULL,
                 comment TEXT NOT NULL,
-                internal BOOLEAN DEFAULT FALSE,
+                internal BOOLEAN DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (report_id) REFERENCES daily_task_reports(id) ON DELETE CASCADE,
                 FOREIGN KEY (commenter_id) REFERENCES users(id)
@@ -617,7 +545,7 @@ def init_db():
         # Create audit_logs table
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS audit_logs (
-                id SERIAL PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 actor_id INTEGER,
                 action TEXT NOT NULL,
                 target_type TEXT,
@@ -627,15 +555,6 @@ def init_db():
             )
         ''')
         logger.debug("✓ audit_logs table ready")
-
-        # migration: check if milestone_id exists in tasks
-        cursor.execute("""
-            SELECT column_name FROM information_schema.columns 
-            WHERE table_name = 'tasks' AND column_name = 'milestone_id'
-        """)
-        if not cursor.fetchone():
-            cursor.execute("ALTER TABLE tasks ADD COLUMN milestone_id INTEGER REFERENCES milestones(id)")
-            logger.info("Migrated tasks table: added milestone_id column")
 
         # Seed initial data if usertypes are empty or missing details
         cursor.execute("SELECT id, user_role FROM usertypes WHERE user_role IN ('Administrator', 'Employee', 'Project-Cordinator')")
@@ -650,25 +569,22 @@ def init_db():
         ids = {}
         for role, desc in defaults.items():
             if role not in existing_types:
-                cursor.execute("INSERT INTO usertypes (user_role, description) VALUES (%s, %s) RETURNING id", (role, desc))
-                result_row = cursor.fetchone()
-                result_dict = dict(result_row) if hasattr(result_row, 'keys') else {'id': result_row[0]}
-                ids[role] = result_dict['id']
+                cursor.execute("INSERT INTO usertypes (user_role, description) VALUES (?, ?)", (role, desc))
+                ids[role] = cursor.lastrowid
             else:
                 ids[role] = existing_types[role]
-                cursor.execute("UPDATE usertypes SET description = %s WHERE id = %s AND (description IS NULL OR description = '' OR description = '-')",
+                cursor.execute("UPDATE usertypes SET description = ? WHERE id = ? AND (description IS NULL OR description = '' OR description = '-')",
                 (desc, ids[role]))
         # Helper to seed permissions
         def seed_perms(ut_id, perms):
             if not ut_id: return
             for module, action in perms:
-                cursor.execute("SELECT id FROM usertype_permissions WHERE usertype_id = %s AND module = %s AND action = %s", (ut_id, module, action))
+                cursor.execute("SELECT id FROM usertype_permissions WHERE usertype_id = ? AND module = ? AND action = ?", (ut_id, module, action))
                 exists_row = cursor.fetchone()
                 if exists_row:
-                    exists_dict = dict(exists_row) if hasattr(exists_row, 'keys') else {'id': exists_row[0]}
-                    cursor.execute("UPDATE usertype_permissions SET granted = %s WHERE id = %s", (True, exists_dict['id']))
+                    cursor.execute("UPDATE usertype_permissions SET granted = ? WHERE id = ?", (True, exists_row['id']))
                 else:
-                    cursor.execute("INSERT INTO usertype_permissions (usertype_id, module, action, granted) VALUES (%s, %s, %s, %s)", (ut_id, module, action, True))
+                    cursor.execute("INSERT INTO usertype_permissions (usertype_id, module, action, granted) VALUES (?, ?, ?, ?)", (ut_id, module, action, True))
 
         # Get IDs for seeding permissions
         admin_id = ids.get('Administrator')
@@ -733,8 +649,8 @@ def migrate_db():
             try:
                 cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
                 logger.debug(f"Added column {column} to table {table}")
-            except psycopg2.Error as e:
-                if "already exists" in str(e).lower() or "duplicate column" in str(e).lower():
+            except sqlite3.OperationalError as e:
+                if "duplicate column" in str(e).lower() or "already exists" in str(e).lower():
                     pass  # Column already exists, skip
                 else:
                     logger.warning(f"Could not add {column} to {table}: {e}")
