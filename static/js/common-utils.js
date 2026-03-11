@@ -298,6 +298,168 @@ function hasRole(userRole, requiredRole) {
 }
 
 /**
+ * Mobile Responsiveness Utilities
+ */
+
+/**
+ * Check if device is mobile based on viewport width
+ */
+function isMobileView() {
+    return window.innerWidth <= 768;
+}
+
+/**
+ * Check if device is tablet based on viewport width
+ */
+function isTabletView() {
+    return window.innerWidth > 768 && window.innerWidth <= 1024;
+}
+
+/**
+ * Check if device is desktop based on viewport width
+ */
+function isDesktopView() {
+    return window.innerWidth > 1024;
+}
+
+/**
+ * Get current screen breakpoint
+ */
+function getCurrentBreakpoint() {
+    const width = window.innerWidth;
+    if (width <= 480) return 'xs';
+    if (width <= 768) return 'md';
+    if (width <= 1024) return 'lg';
+    return 'xl';
+}
+
+/**
+ * Toggle mobile sidebar menu
+ */
+function toggleMobileSidebar(sidebarId = 'sidebar') {
+    const sidebar = document.getElementById(sidebarId);
+    if (!sidebar) {
+        console.warn(`Sidebar with ID '${sidebarId}' not found`);
+        return;
+    }
+    if (isMobileView()) {
+        sidebar.classList.toggle('mobile-open');
+    }
+}
+
+/**
+ * Close mobile sidebar
+ */
+function closeMobileSidebar(sidebarId = 'sidebar') {
+    const sidebar = document.getElementById(sidebarId);
+    if (sidebar && isMobileView()) {
+        sidebar.classList.remove('mobile-open');
+    }
+}
+
+/**
+ * Initialize mobile menu button
+ */
+function initMobileMenuButton(buttonId = 'mobileMenuBtn', sidebarId = 'sidebar') {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        button.addEventListener('click', () => toggleMobileSidebar(sidebarId));
+    }
+
+    // Close sidebar when clicking on nav items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => closeMobileSidebar(sidebarId));
+    });
+}
+
+/**
+ * Handle window resize for responsive behavior
+ */
+function handleResponsiveResize() {
+    if (!isMobileView()) {
+        closeMobileSidebar();
+    }
+}
+
+/**
+ * Initialize responsive behavior
+ */
+function initResponsiveBehavior() {
+    // Handle resize events
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            handleResponsiveResize();
+        }, 250);
+    });
+
+    // Initialize mobile menu button if page loads on mobile
+    if (isMobileView()) {
+        initMobileMenuButton();
+    }
+}
+
+/**
+ * Get safe area insets for notch devices (iOS 11+)
+ */
+function getSafeAreaInsets() {
+    return {
+        top: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || '0'),
+        right: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-right') || '0'),
+        bottom: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0'),
+        left: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-left') || '0')
+    };
+}
+
+/**
+ * Check if touch device
+ */
+function isTouchDevice() {
+    return (('ontouchstart' in window) ||
+            (navigator.maxTouchPoints > 0) ||
+            (navigator.msMaxTouchPoints > 0));
+}
+
+/**
+ * Prevent body scroll on mobile (useful for modals)
+ */
+function preventBodyScroll() {
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Allow body scroll on mobile
+ */
+function allowBodyScroll() {
+    document.body.style.overflow = 'auto';
+}
+
+/**
+ * Adjust table for mobile (converts to card layout for small screens)
+ */
+function makeTableResponsive(tableId) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const rows = table.querySelectorAll('tbody tr');
+    const headers = Array.from(table.querySelectorAll('thead th')).map(h => h.textContent);
+
+    if (isMobileView()) {
+        table.classList.add('responsive-table');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            cells.forEach((cell, index) => {
+                cell.setAttribute('data-label', headers[index] || '');
+            });
+        });
+    } else {
+        table.classList.remove('responsive-table');
+    }
+}
+
+/**
  * Debounce function for search/input
  */
 function debounce(func, wait) {

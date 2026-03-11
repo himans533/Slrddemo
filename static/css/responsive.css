@@ -1,0 +1,1010 @@
+/* ============================================
+   RESPONSIVE CSS - Mobile First Approach
+   ============================================ */
+
+/* Base Mobile Styles (320px and up) */
+
+/* ========== SIDEBAR RESPONSIVENESS ========== */
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        max-height: 60px;
+        overflow-y: visible;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar-header {
+        display: none;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .nav-item {
+        flex: 0 0 auto;
+        padding: 12px 16px;
+        margin: 0;
+        border-radius: 0;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .nav-item i {
+        margin-right: 4px;
+    }
+
+    .sidebar-settings,
+    .sidebar-user {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 70px;
+        padding-bottom: 20px;
+    }
+
+    .top-header {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .breadcrumb-nav {
+        flex-wrap: wrap;
+        font-size: 12px;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .theme-toggle {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+}
+
+/* ========== TABLET ADJUSTMENTS (769px - 1024px) ========== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .main-content {
+        margin-left: 200px;
+    }
+
+    .content-area {
+        padding: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ========== MOBILE SPECIFIC STYLES (320px - 768px) ========== */
+
+@media (max-width: 768px) {
+    /* Typography */
+    body {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 1.25rem !important;
+    }
+
+    h2 {
+        font-size: 1.1rem !important;
+    }
+
+    h3 {
+        font-size: 1rem !important;
+    }
+
+    h4 {
+        font-size: 0.95rem !important;
+    }
+
+    /* Content Area */
+    .content-area {
+        padding: 12px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat-card {
+        min-height: 80px;
+        padding: 16px;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .stat-info h3 {
+        font-size: 20px;
+    }
+
+    .stat-info p {
+        font-size: 12px;
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .project-card {
+        padding: 16px;
+    }
+
+    .project-title {
+        font-size: 15px;
+    }
+
+    .project-description {
+        font-size: 12px;
+    }
+
+    /* Team Grid */
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .team-member-card {
+        padding: 16px;
+    }
+
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    /* Table Responsiveness */
+    .task-table {
+        font-size: 12px;
+    }
+
+    .task-table th {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .task-table td {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    /* Hide less important columns on mobile */
+    .task-table .meta-item.overdue {
+        display: none;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .btn-group,
+    .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        padding: 8px;
+    }
+
+    .btn-sm {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+
+    /* Forms */
+    .form-control {
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* Modal Adjustments */
+    .modal-content {
+        width: 95%;
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+    .modal-content.wide {
+        max-width: 100%;
+    }
+
+    .modal-content.wider {
+        max-width: 100%;
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .modal-header {
+        padding: 16px 20px;
+    }
+
+    .modal-body {
+        padding: 16px;
+        max-height: 60vh;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+    }
+
+    /* Search Box */
+    .search-box input {
+        width: 100%;
+        max-width: 250px;
+        font-size: 14px;
+    }
+
+    /* Tabs */
+    .tabs-header {
+        overflow-x: auto;
+        padding: 0 8px;
+    }
+
+    .tab-btn {
+        padding: 12px 16px;
+        font-size: 12px;
+    }
+
+    /* Tab Navigation */
+    .tabs-nav {
+        flex-wrap: wrap;
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+        flex: 1;
+        min-width: 100px;
+    }
+
+    /* Performance Grid */
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .performance-card {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .performance-card .icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .performance-card .info h3 {
+        font-size: 1.5rem;
+    }
+
+    /* Header */
+    .main-header {
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .main-header h1 {
+        font-size: 1.25rem;
+        width: 100%;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+        padding: 12px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .header-left {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .header-user-info {
+        width: 100%;
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+    }
+
+    /* Project Progress Banner */
+    .project-progress-banner {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .project-progress-banner h2 {
+        font-size: 1rem;
+    }
+
+    .project-progress-banner .progress-value {
+        font-size: 2.5rem;
+    }
+
+    /* Coordinator Panel */
+    .coordinator-panel {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .coordinator-actions {
+        flex-direction: column;
+    }
+
+    .coordinator-actions .btn {
+        width: 100%;
+    }
+
+    /* Content Card */
+    .content-card {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+
+    .content-card h4 {
+        font-size: 15px;
+    }
+
+    /* Update Actions */
+    .update-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .update-actions select,
+    .update-actions input {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .update-actions input[type="number"] {
+        width: 100%;
+    }
+
+    /* Activity Panel */
+    .activity-panel {
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
+        transform: translateY(100%);
+        bottom: 70px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .activity-panel.open {
+        transform: translateY(0);
+    }
+
+    .activity-item {
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .activity-item .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.65rem;
+    }
+
+    /* Permissions Matrix */
+    .permissions-matrix {
+        font-size: 12px;
+    }
+
+    .permissions-matrix th,
+    .permissions-matrix td {
+        padding: 8px;
+    }
+
+    .module-column {
+        width: 150px;
+    }
+
+    .permission-column {
+        width: 60px;
+    }
+
+    /* Utilities */
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+
+    .empty-state h3,
+    .empty-state h4 {
+        font-size: 1rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .priority-badge {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    /* Role Badge */
+    .role-badge {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+
+    /* Help Box */
+    .help-box {
+        padding: 12px;
+    }
+
+    .help-box h5 {
+        font-size: 0.95rem;
+    }
+
+    .help-box ul {
+        font-size: 0.85rem;
+    }
+
+    /* Permission Cell */
+    .permission-cell {
+        text-align: center;
+        padding: 8px;
+    }
+
+    .permission-cell.disabled {
+        opacity: 0.5;
+    }
+
+    /* Task Cards */
+    .task-card {
+        padding: 12px;
+    }
+
+    .task-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .task-header h4 {
+        font-size: 14px;
+    }
+
+    .task-badges {
+        flex-wrap: wrap;
+    }
+
+    /* Comments */
+    .comment-form {
+        padding: 12px;
+    }
+
+    .comments-list {
+        padding: 12px;
+    }
+
+    .comment-item {
+        padding: 8px 0;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Progress Bar */
+    .progress-info {
+        font-size: 12px;
+    }
+
+    /* Meta Items */
+    .meta-item {
+        font-size: 11px;
+    }
+
+    /* Project Meta */
+    .project-meta {
+        gap: 8px;
+    }
+
+    /* Task Meta */
+    .task-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .meta-row {
+        flex-direction: column;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb-nav span {
+        font-size: 12px;
+    }
+
+    .breadcrumb-nav .current {
+        font-size: 13px;
+    }
+}
+
+/* ========== SMALL MOBILE (320px - 480px) ========== */
+
+@media (max-width: 480px) {
+    .sidebar {
+        max-height: 50px;
+    }
+
+    .main-content {
+        margin-bottom: 60px;
+    }
+
+    .nav-item {
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+
+    .nav-item i {
+        font-size: 16px;
+        margin-right: 2px;
+    }
+
+    .content-area {
+        padding: 8px;
+    }
+
+    .stats-grid {
+        gap: 8px;
+    }
+
+    .stat-card {
+        min-height: 70px;
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .stat-info h3 {
+        font-size: 18px;
+    }
+
+    .stat-info p {
+        font-size: 11px;
+    }
+
+    .btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .btn-sm {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+
+    .modal-content {
+        width: 98%;
+    }
+
+    .modal-header {
+        padding: 12px 16px;
+    }
+
+    .modal-body {
+        padding: 12px;
+        max-height: 55vh;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 8px 10px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 1.1rem !important;
+    }
+
+    h2 {
+        font-size: 1rem !important;
+    }
+
+    h3 {
+        font-size: 0.9rem !important;
+    }
+
+    .dashboard-header {
+        padding: 12px;
+    }
+
+    .dashboard-container {
+        padding: 8px;
+    }
+
+    .top-header {
+        padding: 8px 12px;
+    }
+
+    .main-header {
+        padding: 8px 12px;
+    }
+
+    /* Table text size reduction */
+    .task-table {
+        font-size: 11px;
+    }
+
+    .task-table th {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .task-table td {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    .project-card {
+        padding: 12px;
+    }
+
+    .project-title {
+        font-size: 14px;
+    }
+
+    .status-badge {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+
+    .priority-badge {
+        padding: 3px 6px;
+        font-size: 9px;
+    }
+}
+
+/* ========== LARGE DESKTOP (1025px and up) ========== */
+
+@media (min-width: 1025px) {
+    .sidebar {
+        width: 240px;
+    }
+
+    .main-content {
+        margin-left: 240px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .team-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .performance-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+}
+
+/* ========== LANDSCAPE PHONE (568px - 768px height) ========== */
+
+@media (max-height: 600px) and (max-width: 768px) {
+    .sidebar {
+        max-height: 50px;
+    }
+
+    .main-content {
+        margin-bottom: 60px;
+    }
+
+    .content-area {
+        padding: 8px;
+    }
+
+    .modal-body {
+        max-height: 50vh;
+    }
+
+    .activity-panel {
+        max-height: 50vh;
+    }
+}
+
+/* ========== TOUCH DEVICE OPTIMIZATIONS ========== */
+
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .nav-item,
+    .tab-button,
+    .stat-card,
+    .project-card,
+    .task-card {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .btn {
+        padding: 10px 14px;
+    }
+
+    input,
+    textarea,
+    select {
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    .form-control {
+        font-size: 16px;
+    }
+}
+
+/* ========== PRINT STYLES ========== */
+
+@media print {
+    .sidebar,
+    .top-header,
+    .theme-toggle,
+    .logout-btn,
+    .modal-overlay,
+    .activity-panel {
+        display: none !important;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 0;
+    }
+
+    body {
+        background: white;
+    }
+
+    .content-area {
+        padding: 0;
+    }
+}
+
+/* ========== ACCESSIBILITY IMPROVEMENTS ========== */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1c1f2e;
+        color: #e0e6ed;
+    }
+}
+
+/* ========== EXTRA SMALL DEVICES (< 320px) ========== */
+
+@media (max-width: 319px) {
+    body {
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 1rem !important;
+    }
+
+    .btn {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        width: 100%;
+        border-radius: 8px 8px 0 0;
+    }
+}
+
+/* ========== FOLDABLE DEVICES ========== */
+
+@media (fold-left: 0px) or (fold-top: 0px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: relative;
+        height: auto;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* ========== SPECIAL OPTIMIZATIONS ========== */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Optimize font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent zoom on input focus */
+@media (max-width: 768px) {
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .sidebar {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .main-content {
+        margin-bottom: calc(70px + env(safe-area-inset-bottom));
+    }
+}
+
+/* Ensure buttons are clickable */
+@media (max-width: 768px) {
+    .btn-icon,
+    .nav-item,
+    .tab-button,
+    a[role="button"] {
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Optimize overflow for tables */
+@media (max-width: 768px) {
+    .task-table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .permissions-matrix {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Prevent layout shift from scrollbars */
+html {
+    overflow-y: scroll;
+}
+
+/* Fix fixed positioning on mobile */
+@media (max-width: 768px) {
+    .modal-overlay {
+        position: fixed;
+    }
+
+    .activity-panel {
+        position: fixed;
+    }
+}
