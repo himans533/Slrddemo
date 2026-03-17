@@ -8,8 +8,9 @@
     <title>Employee Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    <link href="/responsive.css" rel="stylesheet" />
+    <link href="/static/css/responsive.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/static/js/responsive.js"></script>
     <style>
         * {
             margin: 0;
@@ -960,6 +961,17 @@
 </head>
 
 <body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="hamburger-toggle" title="Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-logo">My Dashboard</div>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
     <div class="dashboard-container">
         <!-- Header -->
         <div class="dashboard-header">
